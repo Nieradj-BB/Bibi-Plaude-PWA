@@ -16,7 +16,7 @@ Klaar is de MVP als vijf echte gesprekken via de PWA zijn gecontroleerd en afger
 | Status en bewerkingen lokaal in de browser | Geen opslag nodig buiten het toestel | Telefoon en laptop delen hun status niet |
 | Vite, React en TypeScript | Snel opzetten, bekend gereedschap | |
 | `vite-plugin-pwa` | Manifest en service worker zonder handwerk | |
-| `@azure/msal-browser` en `@azure/msal-react` | Standaard Microsoft-login voor een app in de browser | |
+| Eerst Gmail met Google-login, later Microsoft | Een Google Cloud-project richt je zelf in, zonder IT. Een tussenlaag voor de mailbron zorgt dat later alleen die laag vervangen wordt door Microsoft Graph. | Inloggen is in de test niet representatief: Google geeft toegang voor een uur, daarna verbindt de app opnieuw |
 | Eigen CSS met de Blue Bricks-kleuren | Geen UI-bibliotheek om te leren | |
 | GitHub Pages, automatisch vanaf `dev` | Gratis, met HTTPS, en de repository is openbaar | De app staat op een openbare URL. Zonder Blue Bricks-inlog is er niets te zien. |
 | Ophalen bij openen, plus een knop Vernieuwen | Werkt zonder backend | |
@@ -27,16 +27,19 @@ Klaar is de MVP als vijf echte gesprekken via de PWA zijn gecontroleerd en afger
 | # | Wat | Wie | Blokkeert |
 |---|---|---|---|
 | V1 | AutoFlow-test gedaan, twee of drie voorbeeldmails beschikbaar | Nieradj | Stap 3 |
-| V2 | Outlook-regel die AutoFlow-mails naar de map `Plaud-verslagen` verplaatst | Nieradj | Stap 2 |
-| V3 | App-registratie in Microsoft Entra ID (zie hieronder) | Nieradj of IT | Stap 2 |
+| V2 | Gmail-filter dat AutoFlow-mails het label `BB-Plaud` geeft | Nieradj | Stap 2 |
+| V3 | Google Cloud-project met Gmail API en OAuth-client (klaar op 27 oktober) | Nieradj | Stap 2 |
 | V4 | GitHub Pages aanzetten, met GitHub Actions als bron | Nieradj | Stap 1 (alleen het publiceren) |
 
-**App-registratie (V3)**
-- Type: single-page application (SPA)
-- Redirect-URI's: `http://localhost:5173/` en `https://nieradj-bb.github.io/Bibi-Plaude-PWA/`
-- Rechten (delegated): `User.Read` en `Mail.Read`
-- Nodig voor de app: de client-ID en de tenant-ID. Die zijn niet geheim.
-- Mag je zelf geen app registreren of geen toestemming geven voor `Mail.Read`, dan doet IT dit.
+**Google Cloud-project (V3)**
+- Project `Verslagen PWA`, Gmail API aan, toestemmingsscherm extern en in testmodus
+- Bereik: `gmail.readonly`
+- OAuth-client van het type webapplicatie, met omleidings-URI's `http://localhost:5173/` en `https://nieradj-bb.github.io/Bibi-Plaude-PWA/`
+- De client-ID staat in `src/config.ts`. Die is niet geheim; het clientgeheim gebruiken we niet.
+
+**Later: Microsoft.** Voor de overstap naar de Outlook-mailbox is een app-registratie in Microsoft Entra ID nodig (type SPA, rechten `User.Read` en `Mail.Read`). Alleen de mailbron en het inloggen veranderen dan.
+
+**Gebruik nagespeelde gesprekken** zolang de mails in een persoonlijke Gmail binnenkomen, zodat er geen klantgegevens in terechtkomen.
 
 **Let op: de repository is openbaar.** Echte AutoFlow-mails gaan nooit in de repository. Testbestanden maken we anoniem: andere namen, klanten en bedragen.
 
@@ -45,7 +48,7 @@ Klaar is de MVP als vijf echte gesprekken via de PWA zijn gecontroleerd en afger
 | Stap | Wat | Klaar als | Tijd |
 |---|---|---|---|
 | 1. Basis | Vite-project, PWA-manifest en iconen, service worker, kleuren en lettertype van Blue Bricks. Publiceren naar GitHub Pages bij elke push naar `dev`. | De lege app staat op het beginscherm van de iPhone | ½ dag |
-| 2. Inloggen en mails ophalen | Microsoft-login via redirect (werkt beter dan een pop-up in een PWA op de iPhone). Inlog bewaren in `localStorage`. De map `Plaud-verslagen` zoeken en de mails ophalen, met bijlagen als het transcript daarin staat. Elke mail maar één keer, op basis van de `internetMessageId`. | Na inloggen zie je de onderwerpen van je AutoFlow-mails | ½ dag |
+| 2. Inloggen en mails ophalen | Google-login via redirect (werkt beter dan een pop-up in een PWA op de iPhone). Inlog bewaren in `localStorage`, na een uur stil opnieuw verbinden. Het label `BB-Plaud` zoeken en de mails ophalen, met bijlagen als het transcript daarin staat. Elke mail maar één keer, op basis van de Message-ID. Tijdelijk scherm dat de mail als tekst toont. | Na inloggen zie je je AutoFlow-mails en hun inhoud | ½ dag |
 | 3. Mail uitlezen | Van mail naar verslag: titel, datum, tijd, duur, de onderdelen van het verslag, feedback en transcript. Eerst de tests op basis van de anonieme voorbeeldmails, dan de code. | De tests slagen voor alle voorbeeldmails, en een onbekende mail valt terug op de hele tekst | ½ tot 1 dag |
 | 4. Schermen | De lijst Te controleren en Afgerond. Het controlescherm: verslag bewerken, gesprekstype kiezen, klant en opdracht invullen, feedback apart, transcript bekijken. Afronden met Gecontroleerd en kopiëren, of Niet bruikbaar. Alles lokaal bewaard. | Een verslag gaat van nieuw naar gecontroleerd en staat op het klembord | 1 dag |
 | 5. Testen in de praktijk | Echte gesprekken opnemen en afronden op de iPhone. Correctietijd en wat tegenvalt bijhouden. | Vijf echte verslagen afgerond | ½ dag bouwen, daarna een testweek |
@@ -70,8 +73,8 @@ Totaal: ongeveer 3 tot 4 dagen bouwen.
 
 ```
 src/
-  auth/      Microsoft-login (MSAL)
-  graph/     mails en bijlagen ophalen
+  auth/      Google-login (later Microsoft)
+  mail/      mailbron: Gmail nu, Microsoft Graph later
   parser/    AutoFlow-mail omzetten naar een verslag, met tests
   store/     status en bewerkingen lokaal bewaren
   screens/   Te controleren, Controleren
@@ -86,7 +89,8 @@ Backend, pushmeldingen, alles met Bibi, meerdere gebruikers, offline werken en s
 
 | Risico | Gevolg | Terugvaloptie |
 |---|---|---|
-| Geen toestemming voor `Mail.Read` | De PWA kan je mailbox niet lezen | Mail importeren: een AutoFlow-mail delen of uploaden naar de PWA. Daarmee is het gemak nog steeds te testen. |
+| Later geen toestemming voor `Mail.Read` bij Microsoft | De PWA kan de Outlook-mailbox niet lezen | Bij Gmail blijven voor de test, of mail importeren: een AutoFlow-mail delen of uploaden naar de PWA |
+| AutoFlow bestaat niet meer (vervangen door Routines vanaf Plaud-app 4.0) | Geen automatische mail | Nagaan of Routines nog mailt; anders Zapier of mail handmatig doorsturen |
 | Het transcript zit als pdf of docx in de bijlage | Uitlezen kost meer werk | In de MVP alleen een knop om de bijlage te openen |
 | AutoFlow verandert de opmaak van de mail | De parser herkent de onderdelen niet meer | Terugval op de hele tekst; de tests laten zien wat er veranderd is |
-| Inloggen werkt anders in een PWA op de iPhone | Steeds opnieuw inloggen | Redirect-login en de inlog in `localStorage` bewaren; vroeg testen in stap 2 |
+| Inloggen werkt anders in een PWA op de iPhone | Steeds opnieuw inloggen | Redirect-login, de inlog in `localStorage` bewaren en stil opnieuw verbinden; vroeg testen in stap 2 |

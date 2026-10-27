@@ -1,0 +1,14 @@
+node_modules/
+dist/
+dev-dist/
+*.local
+.env*
+!.env.example
+
+# Lokale instellingen van Claude Code
+.claude/
+
+# Echte AutoFlow-mails horen nooit in deze openbare repository
+*.eml
+*.msg
+fixtures-private/

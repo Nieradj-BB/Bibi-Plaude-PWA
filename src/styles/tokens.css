@@ -1,0 +1,26 @@
+/* Blue Bricks-kleuren en lettertype; de app heeft voorlopig alleen een licht thema */
+:root {
+  --bb-navy: #222A54;
+  --bb-navy-mid: #1A407E;
+  --bb-cyan: #0098D5;
+  --bb-cyan-ink: #0B6E9C;
+  --bb-cyan-bg: #E1F3FC;
+  --bb-ice-border: #8ED2F2;
+  --bb-gray: #6B7B8D;
+  --bb-white: #FFFFFF;
+
+  --app-bg: #F4F7FB;
+  --app-card: #FFFFFF;
+  --app-line: #E1E8F1;
+  --app-shadow: rgba(34, 42, 84, 0.08);
+  --ok: #17784B;
+  --ok-bg: #E2F4EA;
+  --warn: #9A5B00;
+  --warn-bg: #FFF1D6;
+
+  --font: 'Source Sans 3 Variable', 'Source Sans 3', Calibri, 'Segoe UI', sans-serif;
+  --radius-card: 14px;
+  --radius-btn: 12px;
+
+  color-scheme: light;
+}
