@@ -1,26 +1,47 @@
-/* Blue Bricks-kleuren en lettertype; de app heeft voorlopig alleen een licht thema */
+/* iOS-kleuren (licht) met Blue Bricks-blauw als accentkleur; de app heeft alleen een licht thema */
 :root {
-  --bb-navy: #222A54;
-  --bb-navy-mid: #1A407E;
-  --bb-cyan: #0098D5;
-  --bb-cyan-ink: #0B6E9C;
-  --bb-cyan-bg: #E1F3FC;
-  --bb-ice-border: #8ED2F2;
-  --bb-gray: #6B7B8D;
-  --bb-white: #FFFFFF;
-
-  --app-bg: #F4F7FB;
-  --app-card: #FFFFFF;
-  --app-line: #E1E8F1;
-  --app-shadow: rgba(34, 42, 84, 0.08);
-  --ok: #17784B;
-  --ok-bg: #E2F4EA;
-  --warn: #9A5B00;
-  --warn-bg: #FFF1D6;
-
-  --font: 'Source Sans 3 Variable', 'Source Sans 3', Calibri, 'Segoe UI', sans-serif;
-  --radius-card: 14px;
-  --radius-btn: 12px;
-
   color-scheme: light;
+
+  /* Blue Bricks-blauw, donker genoeg voor tekst en witte letters (5,6:1) */
+  --tint: #0B6E9C;
+  --tint-pressed: #095A80;
+
+  --bg: #F2F2F7;
+  --cell: #FFFFFF;
+  --cell-pressed: #E5E5EA;
+  --fill: rgba(118, 118, 128, 0.12);
+  --fill-strong: rgba(120, 120, 128, 0.2);
+
+  --label: #000000;
+  /* Iets donkerder dan secondaryLabel van iOS, zodat kleine tekst leesbaar blijft (5:1 op wit) */
+  --label-2: #6C6C70;
+  --label-3: #C4C4C7;
+  --separator: rgba(60, 60, 67, 0.29);
+
+  --red: #FF3B30;
+  --red-text: #D70015;
+  --orange: #FF9500;
+  --orange-text: #C93400;
+  --green-text: #248A3D;
+  --purple-text: #8944AB;
+
+  /* Liquid Glass: doorschijnend wit met vervaging */
+  --glass: rgba(255, 255, 255, 0.72);
+  --glass-edge: rgba(0, 0, 0, 0.06);
+  --glass-shadow: 0 6px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  --radius-group: 26px;
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Tekstgroottes van iOS, in rem zodat ze meeschalen met Dynamic Type (17pt = 1rem) */
+  --text-large-title: 2rem;
+  --text-title3: 1.176rem;
+  --text-body: 1rem;
+  --text-subhead: 0.882rem;
+  --text-footnote: 0.765rem;
+  --text-caption2: 0.647rem;
+
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --nav-h: 52px;
 }

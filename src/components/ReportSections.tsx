@@ -1,8 +1,7 @@
 import { useState } from 'react'
 import type { Report } from '../report/report'
+import { EditSheet } from './EditSheet'
 import { Markdown } from './Markdown'
-
-type Section = Report['sections'][number]
 
 type Props = {
   sections: Report['sections']
@@ -10,54 +9,53 @@ type Props = {
   onChange: (index: number, body: string) => void
 }
 
-// Tekstvak groeit mee met de tekst, zodat je op de telefoon niet in een klein vak scrolt
-function rowsFor(text: string) {
-  const lines = text.split('\n').reduce((n, line) => n + Math.max(1, Math.ceil(line.length / 40)), 0)
-  return Math.min(Math.max(lines + 1, 4), 24)
-}
-
-function SectionBlock({ section, disabled, onChange }: { section: Section; disabled: boolean; onChange: (body: string) => void }) {
-  const [editing, setEditing] = useState(false)
-  const isEditing = editing && !disabled
-
-  return (
-    <div className="section">
-      <div className="section-head">
-        {section.title ? <h3>{section.title}</h3> : <span className="section-untitled" />}
-        {section.edited && <span className="chip ready">Aangepast</span>}
-        {!disabled && (
-          <button type="button" className="link-btn" onClick={() => setEditing(!editing)}>
-            {isEditing ? 'Klaar' : 'Bewerken'}
-          </button>
-        )}
-      </div>
-      {isEditing ? (
-        <textarea
-          className="section-edit"
-          value={section.body}
-          rows={rowsFor(section.body)}
-          onChange={(e) => onChange(e.target.value)}
-          aria-label={`${section.title || 'Verslag'} bewerken`}
-          autoFocus
-        />
-      ) : section.body ? (
-        <Markdown>{section.body}</Markdown>
-      ) : (
-        <p className="meta">Leeg</p>
-      )}
-    </div>
-  )
-}
-
-// Het verslag per onderdeel; elk onderdeel bewerk je apart
+// Het verslag per onderdeel, elk als eigen groep; Wijzig opent het onderdeel in een blad
 export function ReportSections({ sections, disabled, onChange }: Props) {
+  const [editing, setEditing] = useState<number | null>(null)
+  const current = editing === null ? undefined : sections[editing]
+
   return (
-    <section className="card">
-      <div className="card-label">Verslag</div>
-      {sections.length === 0 && <p>Deze mail heeft geen tekst.</p>}
-      {sections.map((section, i) => (
-        <SectionBlock key={i} section={section} disabled={disabled} onChange={(body) => onChange(i, body)} />
-      ))}
-    </section>
+    <>
+      <h2 className="section-heading">Verslag</h2>
+
+      {sections.length === 0 && (
+        <div className="group">
+          <p className="cell-text placeholder">Deze mail heeft geen tekst.</p>
+        </div>
+      )}
+
+      {sections.map((section, i) => {
+        const title = section.title || 'Tekst'
+        return (
+          <section key={i} aria-label={title}>
+            <div className="group-header">
+              <span className="group-header-title">
+                {title}
+                {section.edited && ' · Aangepast'}
+              </span>
+              {!disabled && (
+                <button type="button" className="header-btn" onClick={() => setEditing(i)} aria-label={`Wijzig ${title}`}>
+                  Wijzig
+                </button>
+              )}
+            </div>
+            <div className="group cell-text">{section.body ? <Markdown>{section.body}</Markdown> : <p className="placeholder">Leeg</p>}</div>
+          </section>
+        )
+      })}
+
+      {current && editing !== null && (
+        <EditSheet
+          key={editing}
+          title={current.title || 'Tekst'}
+          initial={current.body}
+          onCancel={() => setEditing(null)}
+          onDone={(text) => {
+            if (text !== current.body) onChange(editing, text)
+            setEditing(null)
+          }}
+        />
+      )}
+    </>
   )
 }

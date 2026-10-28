@@ -31,16 +31,16 @@ export function InstallHint() {
   }
 
   return (
-    <section className="card hint" aria-label="App installeren">
-      <div>
-        <h2>Zet Verslagen op je beginscherm</h2>
+    <section className="group" aria-label="App installeren">
+      <div className="cell-text hint">
+        <strong>Zet Verslagen op je beginscherm</strong>
         <p>
           {isIos
             ? 'Tik in Safari op Delen en kies Zet op beginscherm. Dan opent Verslagen als een gewone app.'
             : 'Open het menu van je browser en kies Installeren of Toevoegen aan startscherm.'}
         </p>
       </div>
-      <button type="button" className="link-btn" onClick={dismiss}>
+      <button type="button" className="row text-row" onClick={dismiss}>
         Niet meer tonen
       </button>
     </section>

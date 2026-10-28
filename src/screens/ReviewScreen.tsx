@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
 import { DetailsForm } from '../components/DetailsForm'
+import { Icon } from '../components/Icon'
+import { BackButton, NavBar, useScrolled } from '../components/NavBar'
 import { ReportSections } from '../components/ReportSections'
-import { Transcript } from '../components/Transcript'
+import { StatusLabel } from '../components/ReportRow'
 import { formatReceived, formatSize } from '../format'
 import { usedValues, type Report } from '../report/report'
 import type { ReportStore } from '../store/useReportStore'
@@ -11,15 +12,14 @@ type Props = {
   reports: Report[]
   store: ReportStore
   onBack: () => void
+  onOpenTranscript: () => void
 }
 
 // Controlescherm: Gegevens bevestigen, verslag verbeteren, afronden of Niet bruikbaar
-export function ReviewScreen({ report, reports, store, onBack }: Props) {
+export function ReviewScreen({ report, reports, store, onBack, onOpenTranscript }: Props) {
+  const scrolled = useScrolled()
   const editable = report.status === 'toReview'
-
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [report.id])
+  const turns = report.transcript.length
 
   function finish(status: 'done' | 'unusable') {
     store.setStatus(report.id, status)
@@ -27,29 +27,33 @@ export function ReviewScreen({ report, reports, store, onBack }: Props) {
   }
 
   return (
-    <div className="app">
-      <nav className="nav-row">
-        <button type="button" className="back" onClick={onBack}>
-          <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 4l-6 6 6 6" />
-          </svg>
-          Terug
-        </button>
-      </nav>
+    <>
+      <NavBar
+        title={report.title}
+        showTitle={scrolled}
+        leading={<BackButton to={editable ? 'Te controleren' : 'Afgehandeld'} onClick={onBack} />}
+      />
 
-      <main className="screen">
-        <header className="app-head compact">
-          <h1 className="app-title small">{report.title}</h1>
-          <p className="app-sub review-sub">
-            Ontvangen {formatReceived(report.receivedAt)}
-            {report.status === 'done' && <span className="chip ok">Afgerond</span>}
-            {report.status === 'unusable' && <span className="chip muted">Niet bruikbaar</span>}
-          </p>
-        </header>
+      <main className="screen has-bar">
+        <h1 className="large-title">{report.title}</h1>
+        <p className="large-subtitle">Ontvangen {formatReceived(report.receivedAt)}</p>
 
-        <div className="app-body">
+        <div className="content">
+          {!editable && (
+            <div className="group">
+              <div className="row">
+                <StatusLabel report={report} large />
+              </div>
+            </div>
+          )}
+
           {!report.structured && (
-            <p className="notice">De opbouw van deze mail wijkt af. De hele tekst staat hieronder als verslag; vul de Gegevens zelf in.</p>
+            <div className="group">
+              <div className="row notice-row">
+                <Icon name="exclamationFill" size={22} className="notice-icon" />
+                <span>De opbouw van deze mail wijkt af. De hele tekst staat hieronder als verslag; vul de Gegevens zelf in.</span>
+              </div>
+            </div>
           )}
 
           <DetailsForm
@@ -66,42 +70,54 @@ export function ReviewScreen({ report, reports, store, onBack }: Props) {
             onChange={(index, body) => store.setSection(report.id, index, body)}
           />
 
-          {report.transcript.length > 0 && <Transcript turns={report.transcript} />}
+          {turns > 0 && (
+            <div className="group">
+              <button type="button" className="row" onClick={onOpenTranscript}>
+                <Icon name="doc" size={22} className="row-icon" />
+                <span className="row-label">Transcript</span>
+                <span className="row-value">{turns === 1 ? '1 beurt' : `${turns} beurten`}</span>
+                <Icon name="chevronRight" size={14} className="row-chevron" />
+              </button>
+            </div>
+          )}
 
           {report.attachments.length > 0 && (
-            <section className="card">
-              <div className="card-label">Bijlagen</div>
-              <ul className="attachments">
+            <>
+              <div className="group-header">
+                <span className="group-header-title">Bijlagen</span>
+              </div>
+              <div className="group">
                 {report.attachments.map((a) => (
-                  <li key={a.id}>
-                    <span>{a.filename}</span>
-                    <span className="meta">
-                      {a.mimeType} · {formatSize(a.size)}
-                    </span>
-                  </li>
+                  <div key={a.id} className="row">
+                    <Icon name="paperclip" size={20} className="row-icon" />
+                    <span className="row-label">{a.filename}</span>
+                    <span className="row-value">{formatSize(a.size)}</span>
+                  </div>
                 ))}
-              </ul>
-            </section>
+              </div>
+            </>
           )}
         </div>
       </main>
 
-      <div className="action-bar">
+      <div className="bottom-edge" aria-hidden="true" />
+      <div className="toolbar">
         {editable ? (
           <>
-            <button type="button" className="btn ghost" onClick={() => finish('unusable')}>
+            <button type="button" className="capsule-btn glass" onClick={() => finish('unusable')}>
               Niet bruikbaar
             </button>
-            <button type="button" className="btn primary" onClick={() => finish('done')}>
+            <button type="button" className="capsule-btn prominent" onClick={() => finish('done')}>
+              <Icon name="checkmark" size={18} />
               Afronden
             </button>
           </>
         ) : (
-          <button type="button" className="btn ghost" onClick={() => store.setStatus(report.id, 'toReview')}>
+          <button type="button" className="capsule-btn glass" onClick={() => store.setStatus(report.id, 'toReview')}>
             Terugzetten naar Te controleren
           </button>
         )}
       </div>
-    </div>
+    </>
   )
 }

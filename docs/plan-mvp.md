@@ -16,11 +16,13 @@ De app is een werkbak voor verslagen, geen mailprogramma. De begrippen staan in 
 
 | Onderdeel | Werking |
 |---|---|
-| Startscherm | Werkbak Te controleren, nieuwste verslag bovenaan. Elke kaart toont Onderwerp, klant, gesprekstype, datum en duur, en laat zien als Gegevens ontbreken. |
-| Controlescherm | Bovenaan Gegevens als voorgevulde velden; `[Onbekend]` valt op. Daaronder het verslag per onderdeel, onderaan het transcript ingeklapt. Afronden en Niet bruikbaar staan vast onderin beeld. |
+| Vormgeving | PWA first, zo native mogelijk op de iPhone in de stijl van iOS 26 (Liquid Glass): systeemlettertype dat meeschaalt met de tekstgrootte van de iPhone, iOS-kleuren met Blue Bricks-blauw als accent, alleen een licht thema. Grote titels, gegroepeerde lijsten, een zwevende tabbalk en glazen knoppen. |
+| Navigatie | Een stapel schermen zoals in iOS: werkbak, controlescherm, transcript. Elk scherm schuift in en staat in de geschiedenis, zodat de terugknop en vegen vanaf de linkerrand werken. Omlaag trekken vernieuwt de lijst; op de laptop is er een knop Vernieuwen. |
+| Startscherm | Werkbak Te controleren, nieuwste verslag bovenaan. Elke rij toont Onderwerp, datum, klant, gesprekstype en duur, en laat zien als Gegevens ontbreken. |
+| Controlescherm | Bovenaan Gegevens als iOS-formulier; lege velden tonen Onbekend in oranje. Daaronder het verslag per onderdeel en een rij naar het transcript. Afronden en Niet bruikbaar zweven onderin beeld. |
 | Controleren | Gegevens bevestigen, fouten in namen, bedragen en toezeggingen verbeteren, en beslissen: Afronden of Niet bruikbaar |
-| Bewerken | Per onderdeel van het verslag. Gesprekstype kies je uit de lijst van de Skill; klant en opdracht zijn vrije velden met suggesties uit eerdere verslagen. |
-| Transcript | Alleen naslaan, met een zoekveld |
+| Bewerken | Gegevens direct in het formulier. Een onderdeel van het verslag bewerk je in een blad dat van onderen opschuift, met Annuleer (kruisje) en Gereed (vinkje); pas Gereed bewaart. Gesprekstype kies je uit de lijst van de Skill; klant en opdracht zijn vrije velden met suggesties uit eerdere verslagen. |
+| Transcript | Eigen scherm om na te slaan, met een zoekbalk |
 | Statussen | Te controleren, Afgerond en Niet bruikbaar. Afgerond en Niet bruikbaar staan samen in de tab Afgehandeld, elk met een eigen label. Terugzetten naar Te controleren kan. Afronden zet alleen de status. |
 | Toestellen | De iPhone is het hoofdtoestel; de laptop kan ook, maar elk toestel heeft zijn eigen status ([ADR 0001](adr/0001-lokale-opslag-zonder-backend.md)) |
 | Melding | Geen eigen melding; de melding van Gmail of de Plaud-app is het seintje |
@@ -37,7 +39,7 @@ De app is een werkbak voor verslagen, geen mailprogramma. De begrippen staan in 
 | Vite, React en TypeScript | Snel opzetten, bekend gereedschap | |
 | `vite-plugin-pwa` | Manifest en service worker zonder handwerk | |
 | Eerst Gmail met Google-login, later Microsoft | Een Google Cloud-project richt je zelf in, zonder IT. Een tussenlaag voor de mailbron zorgt dat later alleen die laag vervangen wordt door Microsoft Graph. | Inloggen is in de test niet representatief: Google geeft toegang voor een uur, daarna verbindt de app opnieuw |
-| Eigen CSS met de Blue Bricks-kleuren | Geen UI-bibliotheek om te leren | |
+| Eigen CSS in iOS-stijl, zonder UI-bibliotheek | Geen bibliotheek om te leren; dicht bij iOS met systeemlettertype en -kleuren | Liquid Glass en de iOS-overgangen bootsen we na; ze zijn niet echt van Apple |
 | GitHub Pages, automatisch vanaf `dev` | Gratis, met HTTPS, en de repository is openbaar | De app staat op een openbare URL. Zonder Blue Bricks-inlog is er niets te zien. |
 | Ophalen bij openen, plus een knop Vernieuwen | Werkt zonder backend | |
 | Afronden zet alleen een status | In de MVP gaat er nog niets naar Bibi | Geen kopieerknop: wat je in Bibi wilt hebben, neem je zelf over |
@@ -100,8 +102,9 @@ src/
   parser/    Plaud-mail omzetten naar een verslag, met tests
   report/    verslag: uitgelezen mail met de bewerkingen van de collega erover
   store/     status en bewerkingen lokaal bewaren
-  screens/   Werkbak (Te controleren, Afgehandeld), Controleren
-  styles/    kleuren en lettertype van Blue Bricks
+  navigation/ schermenstapel met geschiedenis, omlaag trekken om te vernieuwen
+  screens/   Werkbak (Te controleren, Afgehandeld), Controleren, Transcript
+  styles/    iOS-stijl: kleuren, tekstgroottes, glas
 ```
 
 ## Wat we bewust overslaan

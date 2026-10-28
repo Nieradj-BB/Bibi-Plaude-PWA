@@ -1,26 +1,24 @@
 import { MAIL_LABEL } from '../config'
 import type { MailError } from '../mail/types'
+import { EmptyState } from './EmptyState'
+import { Icon } from './Icon'
 
 export function MailboxError({ error, onRetry }: { error: MailError; onRetry: () => void }) {
-  if (error.kind === 'labelMissing') {
-    return (
-      <section className="card">
-        <h2>Label {MAIL_LABEL} ontbreekt</h2>
-        <p>Maak in Gmail op de computer een filter dat de mails van Plaud het label {MAIL_LABEL} geeft. Daarna verschijnen ze hier.</p>
-        <button type="button" className="btn ghost" onClick={onRetry}>
-          Opnieuw kijken
-        </button>
-      </section>
-    )
-  }
+  const labelMissing = error.kind === 'labelMissing'
 
   return (
-    <section className="card">
-      <h2>Ophalen lukte niet</h2>
-      <p>{error.message}</p>
-      <button type="button" className="btn ghost" onClick={onRetry}>
-        Opnieuw proberen
+    <EmptyState
+      icon={<Icon name="exclamationFill" size={52} />}
+      title={labelMissing ? `Label ${MAIL_LABEL} ontbreekt` : 'Ophalen lukte niet'}
+      text={
+        labelMissing
+          ? `Maak in Gmail op de computer een filter dat de mails van Plaud het label ${MAIL_LABEL} geeft. Daarna verschijnen ze hier.`
+          : error.message
+      }
+    >
+      <button type="button" className="capsule-btn glass inline" onClick={onRetry}>
+        {labelMissing ? 'Opnieuw kijken' : 'Opnieuw proberen'}
       </button>
-    </section>
+    </EmptyState>
   )
 }
