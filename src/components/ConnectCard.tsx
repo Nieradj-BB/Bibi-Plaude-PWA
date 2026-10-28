@@ -2,7 +2,7 @@ import type { GoogleAuth } from '../auth/useGoogleAuth'
 import { MAIL_LABEL } from '../config'
 
 const errorText: Record<string, string> = {
-  access_denied: 'Je hebt geen toestemming gegeven. Zonder toestemming kan Verslagen je AutoFlow-mails niet lezen.',
+  access_denied: 'Je hebt geen toestemming gegeven. Zonder toestemming kan Verslagen je Plaud-mails niet lezen.',
   state_mismatch: 'Het inloggen is niet goed afgerond. Probeer het nog een keer.',
 }
 

@@ -1,10 +1,27 @@
+import { useState } from 'react'
 import type { TranscriptTurn } from '../parser/plaudMail'
 
 const SPEAKER_COLORS = 4
 
+function escapeRegExp(text: string) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query) return text
+  return text
+    .split(new RegExp(`(${escapeRegExp(query)})`, 'gi'))
+    .map((part, i) => (part.toLowerCase() === query ? <mark key={i}>{part}</mark> : part))
+}
+
+// Transcript om na te slaan: ingeklapt, met zoeken om een naam of bedrag terug te vinden
 export function Transcript({ turns }: { turns: TranscriptTurn[] }) {
+  const [query, setQuery] = useState('')
   const speakers = [...new Set(turns.map((t) => t.speaker))]
   const colorOf = (speaker: string) => `speaker-${speakers.indexOf(speaker) % SPEAKER_COLORS}`
+
+  const q = query.trim().toLowerCase()
+  const shown = q ? turns.filter((t) => t.text.toLowerCase().includes(q) || t.speaker.toLowerCase().includes(q)) : turns
 
   return (
     <details className="card transcript">
@@ -19,11 +36,22 @@ export function Transcript({ turns }: { turns: TranscriptTurn[] }) {
           <path d="M6 8l4 4 4-4" />
         </svg>
       </summary>
+      <input
+        type="search"
+        className="search"
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Zoek in het transcript"
+        aria-label="Zoek in het transcript"
+      />
+      {q && <p className="meta search-count">{shown.length === 1 ? '1 beurt gevonden' : `${shown.length} beurten gevonden`}</p>}
       <ol className="turns">
-        {turns.map((turn, i) => (
+        {shown.map((turn, i) => (
           <li key={i} className={colorOf(turn.speaker)}>
             {turn.speaker && <span className="speaker">{turn.speaker}</span>}
-            <p>{turn.text}</p>
+            <p>
+              <Highlight text={turn.text} query={q} />
+            </p>
           </li>
         ))}
       </ol>

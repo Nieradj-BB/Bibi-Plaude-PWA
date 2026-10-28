@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { DEMO } from '../mail/demo'
 import {
   consumeRedirect,
   currentSession,
@@ -22,7 +23,7 @@ export type GoogleAuth = {
 }
 
 export function useGoogleAuth(): GoogleAuth {
-  const [session, setSession] = useState(() => currentSession())
+  const [session, setSession] = useState(() => (DEMO ? { token: 'demo', expiresAt: Infinity } : currentSession()))
   const error = redirect.kind === 'error' ? redirect.error : null
 
   // Verlopen sessie: stil opnieuw verbinden, tenzij Google net een fout gaf

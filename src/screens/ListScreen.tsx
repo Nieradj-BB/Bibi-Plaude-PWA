@@ -2,10 +2,11 @@ import type { GoogleAuth } from '../auth/useGoogleAuth'
 import { ConnectCard } from '../components/ConnectCard'
 import { InstallHint } from '../components/InstallHint'
 import { MailboxError } from '../components/MailboxError'
-import { MailCard } from '../components/MailCard'
+import { ReportCard } from '../components/ReportCard'
 import type { Tab } from '../components/TabBar'
 import { MAIL_LABEL } from '../config'
 import type { Mailbox } from '../mail/useMailbox'
+import type { Report } from '../report/report'
 
 const buildTime = new Date(__BUILD_TIME__).toLocaleString('nl-NL', {
   day: 'numeric',
@@ -18,27 +19,55 @@ type Props = {
   tab: Tab
   auth: GoogleAuth
   mailbox: Mailbox
+  reports: Report[]
   onOpen: (id: string) => void
 }
 
-function subtitle(auth: GoogleAuth, mailbox: Mailbox) {
+function subtitle(tab: Tab, auth: GoogleAuth, mailbox: Mailbox, shown: number) {
   if (!auth.session) return 'Nog niet verbonden'
-  if (mailbox.status === 'loading' && mailbox.messages.length === 0) return 'Mails ophalen...'
-  const n = mailbox.messages.length
-  return n === 1 ? '1 verslag' : `${n} verslagen`
+  if (mailbox.status === 'loading' && mailbox.messages.length === 0) return 'Verslagen ophalen...'
+  if (tab === 'handled') return shown === 1 ? '1 verslag afgehandeld' : `${shown} verslagen afgehandeld`
+  if (shown === 0) return 'Niets te controleren'
+  return shown === 1 ? '1 verslag wacht op je' : `${shown} verslagen wachten op je`
 }
 
-export function ListScreen({ tab, auth, mailbox, onOpen }: Props) {
-  const isOpen = tab === 'open'
+function EmptyState({ tab, total }: { tab: Tab; total: number }) {
+  if (tab === 'handled') {
+    return (
+      <section className="card">
+        <h2>Nog niets afgehandeld</h2>
+        <p>Verslagen die je afrondt of op Niet bruikbaar zet, komen hier te staan.</p>
+      </section>
+    )
+  }
+  if (total > 0) {
+    return (
+      <section className="card">
+        <h2>Alles gecontroleerd</h2>
+        <p>Na je volgende opname verschijnt het nieuwe verslag hier.</p>
+      </section>
+    )
+  }
+  return (
+    <section className="card">
+      <h2>Nog geen verslagen</h2>
+      <p>Er staan nog geen mails met het label {MAIL_LABEL} in je Gmail. Na je volgende opname verschijnt het verslag hier.</p>
+    </section>
+  )
+}
+
+export function ListScreen({ tab, auth, mailbox, reports, onOpen }: Props) {
+  const isToReview = tab === 'toReview'
   const connected = auth.session !== null
+  const shown = reports.filter((r) => (isToReview ? r.status === 'toReview' : r.status !== 'toReview'))
 
   return (
     <main className="screen">
       <header className="app-head">
         <div className="app-kicker">Verslagen</div>
         <div className="app-head-row">
-          <h1 className="app-title">{isOpen ? 'Te controleren' : 'Afgerond'}</h1>
-          {isOpen && connected && (
+          <h1 className="app-title">{isToReview ? 'Te controleren' : 'Afgehandeld'}</h1>
+          {connected && (
             <button
               type="button"
               className="icon-btn"
@@ -64,31 +93,19 @@ export function ListScreen({ tab, auth, mailbox, onOpen }: Props) {
             </button>
           )}
         </div>
-        <p className="app-sub">{isOpen ? subtitle(auth, mailbox) : 'Nog niets afgerond'}</p>
+        <p className="app-sub">{subtitle(tab, auth, mailbox, shown.length)}</p>
       </header>
 
       <div className="app-body">
-        {isOpen && <InstallHint />}
+        {isToReview && <InstallHint />}
 
-        {isOpen && !connected && <ConnectCard auth={auth} />}
+        {!connected && <ConnectCard auth={auth} />}
 
-        {isOpen && connected && mailbox.error && <MailboxError error={mailbox.error} onRetry={mailbox.reload} />}
+        {connected && mailbox.error && <MailboxError error={mailbox.error} onRetry={mailbox.reload} />}
 
-        {isOpen && connected && mailbox.status === 'ready' && mailbox.messages.length === 0 && (
-          <section className="card">
-            <h2>Nog geen verslagen</h2>
-            <p>Er staan nog geen mails met het label {MAIL_LABEL} in je Gmail. Na je volgende opname verschijnt het verslag hier.</p>
-          </section>
-        )}
+        {connected && mailbox.status === 'ready' && shown.length === 0 && <EmptyState tab={tab} total={reports.length} />}
 
-        {isOpen && connected && mailbox.messages.map((m) => <MailCard key={m.id} message={m} onOpen={() => onOpen(m.id)} />)}
-
-        {!isOpen && (
-          <section className="card">
-            <h2>Afgeronde verslagen</h2>
-            <p>Verslagen die je als gecontroleerd of niet bruikbaar markeert, komen hier te staan.</p>
-          </section>
-        )}
+        {connected && shown.map((r) => <ReportCard key={r.id} report={r} onOpen={() => onOpen(r.id)} />)}
 
         <footer className="foot">
           {connected && mailbox.account && (

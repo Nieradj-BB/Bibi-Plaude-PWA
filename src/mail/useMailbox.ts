@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { knownEmail, rememberEmail } from '../auth/google'
+import { createDemoSource, DEMO } from './demo'
 import { createGmailSource } from './gmail'
 import { MailError, type MailMessage } from './types'
 
@@ -25,11 +26,11 @@ export function useMailbox(token: string | null, onUnauthorized: () => void): Ma
     }
     setStatus('loading')
     try {
-      const source = createGmailSource(token)
+      const source = import.meta.env.DEV && DEMO ? createDemoSource() : createGmailSource(token)
       setMessages(await source.listMessages())
       setError(null)
       setStatus('ready')
-      if (!knownEmail()) {
+      if (!DEMO && !knownEmail()) {
         const email = await source.account()
         rememberEmail(email)
         setAccount(email)

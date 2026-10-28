@@ -2,7 +2,7 @@
 export const GOOGLE_CLIENT_ID = '36238168741-m9t52lnidnbrpgu7ajk3tkp1t6bud1ua.apps.googleusercontent.com'
 export const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly'
 
-// Gmail-label waarin een filter de AutoFlow-mails zet
+// Gmail-label waarin een filter de Plaud-mails zet
 export const MAIL_LABEL = 'BB-Plaud'
 
 // Moet exact overeenkomen met een omleidings-URI van de OAuth-client
