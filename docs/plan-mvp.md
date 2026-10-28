@@ -1,26 +1,47 @@
 # Plan MVP: alleen de Must-onderdelen
 
-Stand: 27 oktober 2026. Ontwikkeling op de branch `dev`.
+Stand: 28 oktober 2026. Ontwikkeling op de branch `dev`.
 
 ## Doel
 
-Zo snel mogelijk testen of de PWA prettig werkt: opname met de Note Pro, AutoFlow mailt het transcript, de PWA toont het verslag, de collega controleert en rondt af. Eén gebruiker, de persoonlijke mailbox, geen Bibi.
+Zo snel mogelijk testen of de PWA prettig werkt: opname met de Note Pro, een Plaud-Routine mailt verslag en transcript, de PWA toont het verslag, de collega controleert en rondt af. Eén gebruiker, de persoonlijke mailbox, geen Bibi.
 
 Klaar is de MVP als vijf echte gesprekken via de PWA zijn gecontroleerd en afgerond op de iPhone.
+
+De PWA is de vaste plek om verslagen te controleren: later gaat een verslag pas na afronden naar Bibi admin ([ADR 0002](adr/0002-pwa-vaste-controleplek.md)). We ontwerpen daarom voor de pilot en bouwen nu alleen het MVP-deel. In de MVP gaat een afgerond verslag nog nergens heen.
+
+## Hoe de app werkt
+
+De app is een werkbak voor verslagen, geen mailprogramma. De begrippen staan in [GLOSSARY.md](../GLOSSARY.md).
+
+| Onderdeel | Werking |
+|---|---|
+| Startscherm | Werkbak Te controleren, nieuwste verslag bovenaan. Elke kaart toont Onderwerp, klant, gesprekstype, datum en duur, en laat zien als Gegevens ontbreken. |
+| Controlescherm | Bovenaan Gegevens als voorgevulde velden; `[Onbekend]` valt op. Daaronder het verslag per onderdeel, onderaan het transcript ingeklapt. Afronden en Niet bruikbaar staan vast onderin beeld. |
+| Controleren | Gegevens bevestigen, fouten in namen, bedragen en toezeggingen verbeteren, en beslissen: Afronden of Niet bruikbaar |
+| Bewerken | Per onderdeel van het verslag. Gesprekstype kies je uit de lijst van de Skill; klant en opdracht zijn vrije velden met suggesties uit eerdere verslagen. |
+| Transcript | Alleen naslaan, met een zoekveld |
+| Statussen | Te controleren, Afgerond en Niet bruikbaar. Afgerond en Niet bruikbaar staan samen in de tab Afgehandeld, elk met een eigen label. Terugzetten naar Te controleren kan. Afronden zet alleen de status. |
+| Toestellen | De iPhone is het hoofdtoestel; de laptop kan ook, maar elk toestel heeft zijn eigen status ([ADR 0001](adr/0001-lokale-opslag-zonder-backend.md)) |
+| Melding | Geen eigen melding; de melding van Gmail of de Plaud-app is het seintje |
+| Andere gesprekstypen | Intern overleg, dictaat en overig toont de app ook, en die kun je gewoon afronden |
+| Mail met een andere opbouw | Wordt één verslag met de hele tekst en lege Gegevens, met een melding dat de opbouw afwijkt |
+| Twee mails voor één opname | Twee verslagen; de collega zet er één op Niet bruikbaar |
 
 ## Keuzes voor snelheid
 
 | Keuze | Waarom | Wat we ervoor inleveren |
 |---|---|---|
 | Alleen een frontend, geen backend | De PWA leest de mailbox zelf via Microsoft Graph, met de inlog van de gebruiker. Geen server, geen database. | Geen pushmeldingen. Nieuwe verslagen verschijnen als je de PWA opent. |
-| Status en bewerkingen lokaal in de browser | Geen opslag nodig buiten het toestel | Telefoon en laptop delen hun status niet |
+| Status en bewerkingen lokaal in de browser, zonder backend en zonder app-map in de cloud ([ADR 0001](adr/0001-lokale-opslag-zonder-backend.md)) | Geen opslag nodig buiten het toestel. In de POC gaat een afgerond verslag nergens heen, dus delen tussen toestellen is gemak en geen noodzaak. | Telefoon en laptop delen hun status niet. De iPhone is het hoofdtoestel; een verslag rond je af op het toestel waar je eraan begon. |
 | Vite, React en TypeScript | Snel opzetten, bekend gereedschap | |
 | `vite-plugin-pwa` | Manifest en service worker zonder handwerk | |
 | Eerst Gmail met Google-login, later Microsoft | Een Google Cloud-project richt je zelf in, zonder IT. Een tussenlaag voor de mailbron zorgt dat later alleen die laag vervangen wordt door Microsoft Graph. | Inloggen is in de test niet representatief: Google geeft toegang voor een uur, daarna verbindt de app opnieuw |
 | Eigen CSS met de Blue Bricks-kleuren | Geen UI-bibliotheek om te leren | |
 | GitHub Pages, automatisch vanaf `dev` | Gratis, met HTTPS, en de repository is openbaar | De app staat op een openbare URL. Zonder Blue Bricks-inlog is er niets te zien. |
 | Ophalen bij openen, plus een knop Vernieuwen | Werkt zonder backend | |
-| Parser op basis van een echte AutoFlow-mail | De opmaak van de mail is nog onbekend | Lukt het splitsen niet, dan toont de PWA de hele mail als verslag |
+| Afronden zet alleen een status | In de MVP gaat er nog niets naar Bibi | Geen kopieerknop: wat je in Bibi wilt hebben, neem je zelf over |
+| Parser op basis van de vaste opbouw van de Skill *BB-gespreksverslag*; andere opbouwen, zoals het briefing-template, ondersteunen we niet | De Skill schrijft blok `## Gegevens`, `## Verslag` en `## Volledig transcript` voor | Lukt het splitsen niet, dan toont de PWA de hele mail als verslag, met lege Gegevens |
 
 ## Voorwaarden voordat we bouwen
 
@@ -49,9 +70,9 @@ Klaar is de MVP als vijf echte gesprekken via de PWA zijn gecontroleerd en afger
 |---|---|---|---|
 | 1. Basis | Vite-project, PWA-manifest en iconen, service worker, kleuren en lettertype van Blue Bricks. Publiceren naar GitHub Pages bij elke push naar `dev`. | De lege app staat op het beginscherm van de iPhone | ½ dag |
 | 2. Inloggen en mails ophalen | Google-login via redirect (werkt beter dan een pop-up in een PWA op de iPhone). Inlog bewaren in `localStorage`, na een uur stil opnieuw verbinden. Het label `BB-Plaud` zoeken en de mails ophalen, met bijlagen als het transcript daarin staat. Elke mail maar één keer, op basis van de Message-ID. Tijdelijk scherm dat de mail als tekst toont. | Na inloggen zie je je AutoFlow-mails en hun inhoud | ½ dag |
-| 3. Mail uitlezen | Van mail naar verslag: titel, datum, tijd, duur, de onderdelen van het verslag, feedback en transcript. Eerst de tests op basis van de anonieme voorbeeldmails, dan de code. | De tests slagen voor alle voorbeeldmails, en een onbekende mail valt terug op de hele tekst | ½ tot 1 dag |
-| 4. Schermen | De lijst Te controleren en Afgerond. Het controlescherm: verslag bewerken, gesprekstype kiezen, klant en opdracht invullen, feedback apart, transcript bekijken. Afronden met Gecontroleerd en kopiëren, of Niet bruikbaar. Alles lokaal bewaard. | Een verslag gaat van nieuw naar gecontroleerd en staat op het klembord | 1 dag |
-| 5. Testen in de praktijk | Echte gesprekken opnemen en afronden op de iPhone. Correctietijd en wat tegenvalt bijhouden. | Vijf echte verslagen afgerond | ½ dag bouwen, daarna een testweek |
+| 3. Mail uitlezen | Van mail naar verslag: het blok Gegevens (gesprekstype, onderwerp, klant, opdracht, deelnemers, datum, duur; `[Onbekend]` wordt een leeg veld), het verslag per onderdeel en het transcript. Het Onderwerp wordt de titel. Eerst de tests op basis van de anonieme voorbeeldmails, dan de code. | De tests slagen voor alle voorbeeldmails, en een mail met een andere opbouw valt terug op de hele tekst | ½ tot 1 dag |
+| 4. Schermen | Werkbak, tab Afgehandeld en controlescherm, zoals beschreven onder *Hoe de app werkt*. Status en verbeteringen lokaal bewaard. | Een verslag gaat van Te controleren naar Afgerond, en de verbeteringen staan er na opnieuw openen nog | 1½ dag |
+| 5. Testen in de praktijk | Echte gesprekken opnemen en controleren, vooral op de iPhone. We meten niets; na de testweek beoordelen we of controleren prettig werkt. | Vijf echte verslagen afgerond | Een testweek |
 
 Totaal: ongeveer 3 tot 4 dagen bouwen.
 
@@ -61,29 +82,31 @@ Totaal: ongeveer 3 tot 4 dagen bouwen.
 |---|---|
 | Installeerbare PWA | 1 |
 | Inloggen met je Blue Bricks-account | 2 |
-| AutoFlow-mails ophalen | 2 |
+| Plaud-mails ophalen | 2 |
 | Mail uitlezen | 3 |
 | Lijst Te controleren | 4 |
 | Controlescherm | 4 |
-| Feedback apart tonen | 3 en 4 |
 | Transcript bekijken | 3 en 4 |
 | Afronden | 4 |
+
+*Feedback apart tonen* is vervallen (28 oktober): de Skill geeft geen feedback op de gespreksvoering. *Gecontroleerd en kopiëren* is ook vervallen (28 oktober): afronden zet alleen de status.
 
 ## Opbouw van de code
 
 ```
 src/
   auth/      Google-login (later Microsoft)
-  mail/      mailbron: Gmail nu, Microsoft Graph later
-  parser/    AutoFlow-mail omzetten naar een verslag, met tests
+  mail/      mailbron: Gmail nu, Microsoft Graph later; demo-mails voor ontwikkelen
+  parser/    Plaud-mail omzetten naar een verslag, met tests
+  report/    verslag: uitgelezen mail met de bewerkingen van de collega erover
   store/     status en bewerkingen lokaal bewaren
-  screens/   Te controleren, Controleren
+  screens/   Werkbak (Te controleren, Afgehandeld), Controleren
   styles/    kleuren en lettertype van Blue Bricks
 ```
 
 ## Wat we bewust overslaan
 
-Backend, pushmeldingen, alles met Bibi, meerdere gebruikers, offline werken en synchroniseren tussen toestellen. Tests schrijven we alleen voor de parser, want daar zit het meeste risico.
+Backend, eigen meldingen, alles met Bibi (ook kopiëren), meerdere gebruikers, offline werken, synchroniseren tussen toestellen, metingen in de testweek en het herkennen van dubbele verslagen. Tests schrijven we alleen voor de parser, want daar zit het meeste risico.
 
 ## Risico's en terugvalopties
 
