@@ -22,15 +22,24 @@ export function StatusLabel({ report, large = false }: { report: Report; large?:
       </span>
     )
   }
-  if (hasMissingDetails(report.details)) {
-    return (
-      <span className={`status warn${className}`}>
-        <Icon name="exclamationFill" size={size} />
-        Gegevens onvolledig
-      </span>
-    )
-  }
-  return null
+  const missing = hasMissingDetails(report.details)
+  if (!report.inProgress && !missing) return null
+  return (
+    <span className="statuses">
+      {report.inProgress && (
+        <span className={`status busy${className}`}>
+          <Icon name="pencilCircleFill" size={size} />
+          Bezig
+        </span>
+      )}
+      {missing && (
+        <span className={`status warn${className}`}>
+          <Icon name="exclamationFill" size={size} />
+          Gegevens onvolledig
+        </span>
+      )}
+    </span>
+  )
 }
 
 // Rij in de werkbak, zoals een mail in de lijst van Mail

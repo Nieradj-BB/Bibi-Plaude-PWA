@@ -19,11 +19,12 @@ De app is een werkbak voor verslagen, geen mailprogramma. De begrippen staan in 
 | Vormgeving | PWA first, zo native mogelijk op de iPhone in de stijl van iOS 26 (Liquid Glass): systeemlettertype dat meeschaalt met de tekstgrootte van de iPhone, iOS-kleuren met Blue Bricks-blauw als accent, alleen een licht thema. Grote titels, gegroepeerde lijsten, een zwevende tabbalk en glazen knoppen. |
 | Navigatie | Een stapel schermen zoals in iOS: werkbak, controlescherm, transcript. Elk scherm schuift in en staat in de geschiedenis, zodat de terugknop en vegen vanaf de linkerrand werken. Omlaag trekken vernieuwt de lijst; op de laptop is er een knop Vernieuwen. |
 | Startscherm | Werkbak Te controleren, nieuwste verslag bovenaan. Elke rij toont Onderwerp, datum, klant, gesprekstype en duur, en laat zien als Gegevens ontbreken. |
-| Controlescherm | Bovenaan Gegevens als iOS-formulier; lege velden tonen Onbekend in oranje. Daaronder het verslag per onderdeel en een rij naar het transcript. Afronden en Niet bruikbaar zweven onderin beeld. |
+| Controlescherm | Bovenaan Gegevens als iOS-formulier; lege velden tonen Onbekend in oranje. Daaronder het verslag per onderdeel en een rij naar het transcript. Afronden en Niet bruikbaar zweven onderin beeld; rechtsboven staat Bewaar. |
 | Controleren | Gegevens bevestigen, fouten in namen, bedragen en toezeggingen verbeteren, en beslissen: Afronden of Niet bruikbaar |
 | Bewerken | Gegevens direct in het formulier. Een onderdeel van het verslag bewerk je in een blad dat van onderen opschuift, met Annuleer (kruisje) en Gereed (vinkje); pas Gereed bewaart. Gesprekstype kies je uit de lijst van de Skill; klant en opdracht zijn vrije velden met suggesties uit eerdere verslagen. |
 | Transcript | Eigen scherm om na te slaan, met een zoekbalk |
 | Statussen | Te controleren, Afgerond en Niet bruikbaar. Afgerond en Niet bruikbaar staan samen in de tab Afgehandeld, elk met een eigen label. Terugzetten naar Te controleren kan. Afronden zet alleen de status. |
+| Bewaren | Wijzigingen worden altijd meteen op het toestel bewaard. Bewaar gaat terug naar de lijst zonder af te ronden; het verslag blijft Te controleren en krijgt het label Bezig. Dat label krijgt het ook als je iets wijzigt en met Terug teruggaat. |
 | Toestellen | De iPhone is het hoofdtoestel; de laptop kan ook, maar elk toestel heeft zijn eigen status ([ADR 0001](adr/0001-lokale-opslag-zonder-backend.md)) |
 | Melding | Geen eigen melding; de melding van Gmail of de Plaud-app is het seintje |
 | Andere gesprekstypen | Intern overleg, dictaat en overig toont de app ook, en die kun je gewoon afronden |

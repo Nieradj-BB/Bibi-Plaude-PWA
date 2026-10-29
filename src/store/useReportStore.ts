@@ -21,6 +21,7 @@ export type ReportStore = {
   setStatus: (id: string, status: ReportStatus) => void
   setDetails: (id: string, details: ReportDetails) => void
   setSection: (id: string, index: number, body: string) => void
+  markSaved: (id: string) => void
 }
 
 export function useReportStore(): ReportStore {
@@ -46,5 +47,6 @@ export function useReportStore(): ReportStore {
       (id, index, body) => update(id, (c) => ({ ...c, sections: { ...c.sections, [index]: body } })),
       [update],
     ),
+    markSaved: useCallback((id) => update(id, (c) => ({ ...c, saved: true })), [update]),
   }
 }

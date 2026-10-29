@@ -42,6 +42,12 @@ const ICONS = {
       <path d="M7.8 12.3l2.9 2.9 5.5-6" stroke="#fff" strokeWidth={2.2} />
     </>
   ),
+  pencilCircleFill: (
+    <>
+      <circle cx="12" cy="12" r="9.5" fill="currentColor" stroke="none" />
+      <path d="M8.2 15.8l.6-2.6 5.4-5.4a1.3 1.3 0 0 1 1.9 1.9l-5.4 5.4z" stroke="#fff" strokeWidth={1.6} />
+    </>
+  ),
   minusCircleFill: (
     <>
       <circle cx="12" cy="12" r="9.5" fill="currentColor" stroke="none" />

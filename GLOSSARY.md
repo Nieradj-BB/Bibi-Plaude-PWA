@@ -72,6 +72,14 @@ _Avoid_: Reviewen, goedkeuren, nakijken
 De status van een verslag dat binnen is en nog op de collega wacht.
 _Avoid_: Nieuw, open
 
+**Bezig**:
+Een verslag dat nog Te controleren is, maar dat de collega heeft bewaard of al heeft gewijzigd. Geen aparte status.
+_Avoid_: Concept, in behandeling, opgeslagen
+
+**Bewaren**:
+Een verslag opslaan zonder het af te ronden; het blijft Te controleren en is daarna Bezig.
+_Avoid_: Opslaan als concept
+
 **Afgerond**:
 De status van een verslag dat de collega heeft gecontroleerd en klaar vindt, ongeacht het gesprekstype.
 _Avoid_: Gecontroleerd, goedgekeurd

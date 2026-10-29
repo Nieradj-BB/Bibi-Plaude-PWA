@@ -17,6 +17,8 @@ export type ReportEdits = {
   status: ReportStatus
   details?: ReportDetails
   sections?: Record<number, string>
+  // Gezet met Bewaar: de collega is begonnen, ook als er (nog) niets is gewijzigd
+  saved?: boolean
 }
 
 // De mail uitgelezen, nog zonder bewerkingen
@@ -41,6 +43,8 @@ export type Report = {
   transcript: TranscriptTurn[]
   attachments: MailAttachment[]
   status: ReportStatus
+  // Bezig: nog Te controleren, maar bewaard of al gewijzigd
+  inProgress: boolean
 }
 
 export const CONVERSATION_TYPES = [
@@ -85,6 +89,7 @@ export function applyEdits(mail: MailReport, edits: ReportEdits | undefined): Re
     transcript: mail.transcript,
     attachments: mail.attachments,
     status: edits?.status ?? 'toReview',
+    inProgress: (edits?.status ?? 'toReview') === 'toReview' && Boolean(edits?.saved || edits?.details || edits?.sections),
   }
 }
 

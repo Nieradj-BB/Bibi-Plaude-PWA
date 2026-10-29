@@ -137,6 +137,16 @@ input, select, textarea { font: inherit; color: inherit; }
 .glass-btn:active { transform: scale(0.9); }
 .glass-btn:disabled { cursor: default; }
 .glass-btn.plain { background: var(--fill); }
+.glass-capsule {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 22px;
+  color: var(--tint);
+  font-size: var(--text-body);
+  font-weight: 600;
+  transition: transform 0.25s var(--ease-ios);
+}
+.glass-capsule:active { transform: scale(0.94); }
 .glass-btn.tinted { background: var(--tint); color: #fff; box-shadow: 0 4px 12px rgba(11, 110, 156, 0.3); }
 
 /* Zwevende tabbalk */
@@ -322,6 +332,8 @@ button.row:active { background: var(--cell-pressed); transition: none; }
   text-overflow: ellipsis;
 }
 .status { display: inline-flex; align-items: center; gap: 5px; margin-top: 2px; font-size: var(--text-footnote); font-weight: 500; }
+.statuses { display: flex; flex-wrap: wrap; gap: 2px 12px; }
+.status.busy { color: var(--tint); }
 .status.warn { color: var(--orange-text); }
 .status.ok { color: var(--green-text); }
 .status.muted { color: var(--label-2); }

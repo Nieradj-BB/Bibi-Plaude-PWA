@@ -26,12 +26,25 @@ export function ReviewScreen({ report, reports, store, onBack, onOpenTranscript 
     onBack()
   }
 
+  // Wijzigingen staan al bewaard; Bewaar markeert het verslag als Bezig en gaat terug naar de lijst
+  function save() {
+    store.markSaved(report.id)
+    onBack()
+  }
+
   return (
     <>
       <NavBar
         title={report.title}
         showTitle={scrolled}
         leading={<BackButton to={editable ? 'Te controleren' : 'Afgehandeld'} onClick={onBack} />}
+        trailing={
+          editable && (
+            <button type="button" className="glass glass-capsule" onClick={save}>
+              Bewaar
+            </button>
+          )
+        }
       />
 
       <main className="screen has-bar">
